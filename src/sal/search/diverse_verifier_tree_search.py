@@ -137,7 +137,7 @@ def _dvts(batch_of_prompts: list[str], config: Config, llm: LLM, prm: PRM):
 
         # filter / prune
         for beam in gen_beams:
-            if "boxed{" in beam.current_text:
+            if "##END" in beam.current_text:
                 beam.pruned = True
 
     # we need to copy the results from the last iteration in to beam_width beams as otherwise we would only have n/m results
