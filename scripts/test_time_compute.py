@@ -25,6 +25,8 @@ from sal.utils.data import get_dataset, save_dataset
 from sal.utils.parser import H4ArgumentParser
 from sal.utils.score import score
 
+from langchain_nvidia_ai_endpoints import ChatNVIDIA
+
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
@@ -44,14 +46,15 @@ def main():
 
     approach_fn = APPROACHES[config.approach]
 
-    num_gpus = torch.cuda.device_count()
-    llm = LLM(
-        model=config.model_path,
-        gpu_memory_utilization=config.gpu_memory_utilization,
-        enable_prefix_caching=True,
-        seed=config.seed,
-        tensor_parallel_size=num_gpus,
-    )
+    # num_gpus = torch.cuda.device_count()
+    llm = ChatNVIDIA(base_url="http://localhost:8000/v1", model="mistral-nemo-12b-instruct")
+    # llm = LLM(
+    #     model=config.model_path,
+    #     gpu_memory_utilization=config.gpu_memory_utilization,
+    #     enable_prefix_caching=True,
+    #     seed=config.seed,
+    #     tensor_parallel_size=num_gpus,
+    # )
     prm = load_prm(config)
 
     dataset = get_dataset(config)

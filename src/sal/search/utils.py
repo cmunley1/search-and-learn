@@ -112,17 +112,21 @@ def generate_k_steps(
             gen_result.initial_prompt + gen_result.lookahead_text
             for gen_result in current_gen
         ]
-        llm_outputs = llm.generate(gen_prompts, gen_sampling_params, use_tqdm=False)
+        print(f"#### gen_prompts = {gen_prompts}")
+        llm_outputs = llm.batch(gen_prompts)
+        # , gen_sampling_params, use_tqdm=False)
         for gen_result, output in zip(current_gen, llm_outputs):
-            gen_text = output.outputs[0].text
+            # gen_text = output.outputs[0].text
+            gen_text = output.content
             if i == 0:
                 gen_result.first_step_text = gen_text
-                gen_result.first_step_stop_reason = output.outputs[0].stop_reason
+                gen_result.first_step_stop_reason = output.response_metadata["finish_reason"]
+                # outputs[0].stop_reason
                 if gen_result.first_step_stop_reason is None:
                     gen_result.first_step_stop_reason = "EOS"
 
             gen_result.lookahead_text = gen_result.lookahead_text + gen_text
-            gen_result.stop_reason = output.outputs[0].stop_reason
+            gen_result.stop_reason = output.response_metadata["finish_reason"]
             if gen_result.stop_reason is None:
                 gen_result.stop_reason = "EOS"
 
