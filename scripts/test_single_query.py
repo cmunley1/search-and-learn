@@ -45,8 +45,7 @@ def main():
     # run test-time compute method 
     approach_results = approach_fn(examples, config, llm, prm)
 
-    # Extract outputs
-    # approach_results is (i think):
+    # Extract outputs, approach_results should be:
     # {
     #   "completions": list[list[str]],
     #   "pred": list[str],
@@ -59,7 +58,6 @@ def main():
     all_completions = approach_results["completions"][0]
     scores = approach_results["scores"][0]
 
-    # 6. Print use the results
     print("---- Results ----")
     print(f"Prompt: {query}")
     print("\nAll completions:")
