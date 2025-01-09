@@ -112,7 +112,7 @@ def _dvts(batch_of_prompts: list[str], config: Config, llm: LLM, prm: PRM):
             f"Where [answer] is just the final number or expression that solves the problem."
             f"<|eot_id|>"
             f"<|start_header_id|>user<|end_header_id|>\n\n"
-            f'      "prompt": "{conv[0]["content"]}",'
+            f'      "prompt": "{conv[1]["content"]}",'
             f"<|eot_id|>"
             f"<|start_header_id|>assistant<|end_header_id|>\n\n"
             for conv in convs
