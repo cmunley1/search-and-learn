@@ -80,6 +80,7 @@ def _dvts(batch_of_prompts: list[str], config: Config, llm: LLM, prm: PRM):
             build_conv(b.prompt, b.current_text, config.system_prompt)
             for b in gen_beams
         ]
+        
         continue_final_message = i > 0
         add_generation_prompt = i == 0
 
@@ -93,38 +94,13 @@ def _dvts(batch_of_prompts: list[str], config: Config, llm: LLM, prm: PRM):
         #     continue_final_message=continue_final_message,
         #     tokenize=False,
         # )
-        templated_convs = [
-            f"<|start_header_id|>system<|end_header_id|>\n\n"
-            f"Cutting Knowledge Date: December 2023\n"
-            f"Today Date: 09 Jan 2025\n\n"
-            f"Solve the following math problem efficiently and clearly:\n\n"
-            f"- For simple problems (2 steps or fewer):\n"
-            f"Provide a concise solution with minimal explanation.\n\n"
-            f"- For complex problems (3 steps or more):\n"
-            f"Use this step-by-step format:\n\n"
-            f"## Step 1: [Concise description]\n"
-            f"[Brief explanation and calculations]\n\n"
-            f"## Step 2: [Concise description]\n"
-            f"[Brief explanation and calculations]\n\n"
-            f"...\n\n"
-            f"Regardless of the approach, always conclude with:\n\n"
-            f"Therefore, the final answer is: $\\boxed{{answer}}$. I hope it is correct.\n\n"
-            f"Where [answer] is just the final number or expression that solves the problem."
-            f"<|eot_id|>"
-            f"<|start_header_id|>user<|end_header_id|>\n\n"
-            f'      "prompt": "{conv[1]["content"]}",'
-            f"<|eot_id|>"
-            f"<|start_header_id|>assistant<|end_header_id|>\n\n"
-            for conv in convs
-        ]
-
-        # print(f"####################################\nTEMPLATED CONVS: {templated_convs}")
-        # print(f"####################################\nTEMPLATED CONVS 2: {templated_convs2}")
+        templated_convs = [config.system_prompt + "\n\n## User Instruction: " + conv[1]["content"] for conv in convs]
+        # print(f"#####\nTEMPLATED CONVS: {templated_convs}")
 
         lookahead = 0 if i == config.num_iterations - 1 else config.lookahead
         gen_results = generate_k_steps(
             templated_convs, lookahead, llm, sampling_params, config.beam_width
-        )
+        ) 
 
         prompts, completions = [], []
         for beam, gen_result in zip(gen_beams, gen_results, strict=True):
